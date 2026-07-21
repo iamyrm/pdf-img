@@ -450,17 +450,21 @@
         for (let i = 1; i <= totalPages; i++) {
           try {
             const page = await pdfDocument.getPage(i);
-            const scale = 2.0; // high quality
-            const viewport = page.getViewport({ scale });
+            // Calculate scale to reach ~8K resolution (7680px on the long side)
+            const viewport = page.getViewport({ scale: 1 });
+            const longSide = Math.max(viewport.width, viewport.height);
+            const targetLongSide = 7680;
+            const scale = Math.max(2.0, targetLongSide / longSide);
+            const scaledViewport = page.getViewport({ scale });
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d', { alpha: false, willReadFrequently: false });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
 
             const renderContext = {
               canvasContext: context,
-              viewport: viewport,
+              viewport: scaledViewport,
               background: 'white',
               enableWebGL: false,
               imageLayer: false,
