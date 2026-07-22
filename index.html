@@ -528,6 +528,9 @@
               background: 'white',
               enableWebGL: false,
               imageLayer: false,
+              renderInteractiveForms: true,
+              enableXFA: true,
+              annotationMode: 2,
             };
             await page.render(renderContext).promise;
 
@@ -656,7 +659,13 @@
         reader.onload = async (e) => {
           try {
             const arrayBuffer = e.target.result;
-            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer, useSystemFonts: true });
+            const loadingTask = pdfjsLib.getDocument({
+              data: arrayBuffer,
+              useSystemFonts: true,
+              enableXFA: true,
+              fontExtraProperties: true,
+              standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/standard_fonts/'
+            });
             pdfDocument = await loadingTask.promise;
             pageCount = pdfDocument.numPages;
             pageCountBadge.textContent = `📄 ${pageCount} pages`;
